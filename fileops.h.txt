@@ -1,0 +1,8 @@
+#ifndef FILEOPS_H
+#define FILEOPS_H
+
+void copy_file(const char *current_path);
+void delete_file(const char *current_path);
+void rename_file(const char *current_path);
+
+#endif

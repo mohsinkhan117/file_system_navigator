@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include "search.h"
+
+static int found_count = 0;
+
+/* ─── Internal recursive search helper ─── */
+static void search_recursive(const char *dir_path, const char *target) {
+    DIR *dir = opendir(dir_path);        /* system call: opendir */
+    if (!dir) return;
+
+    struct dirent *entry;
+    struct stat st;
+    char full_path[1024];
+
+    while ((entry = readdir(dir)) != NULL) {   /* system call: readdir */
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+
+        snprintf(full_path, sizeof(full_path), "%s/%s", dir_path, entry->d_name);
+        stat(full_path, &st);                  /* system call: stat */
+
+        /* Check if name matches (case-sensitive substring match) */
+        if (strstr(entry->d_name, target)) {
+            printf("  [%s] %s\n",
+                   S_ISDIR(st.st_mode) ? "DIR " : "FILE",
+                   full_path);
+            found_count++;
+        }
+
+        /* Recurse into subdirectories */
+        if (S_ISDIR(st.st_mode)) {
+            search_recursive(full_path, target);
+        }
+    }
+
+    closedir(dir);    /* system call: closedir */
+}
+
+/* ─── Public search entry point ─── */
+void search_file(const char *base_path) {
+    char target[256];
+    printf("Enter filename/keyword to search: ");
+    scanf("%s", target);
+
+    printf("\nSearching for '%s' in '%s' ...\n\n", target, base_path);
+    found_count = 0;
+
+    search_recursive(base_path, target);
+
+    if (found_count == 0)
+        printf("  [!] No files found matching '%s'.\n", target);
+    else
+        printf("\n  [✓] Found %d match(es).\n", found_count);
+
+    printf("\n");
+}

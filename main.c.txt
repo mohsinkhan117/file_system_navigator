@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include "navigator.h"
+#include "fileops.h"
+#include "search.h"
+
+/* ─── Print the main menu ─── */
+void print_menu(const char *current_path) {
+    printf("\n╔══════════════════════════════════════════╗\n");
+    printf("║       FILE SYSTEM NAVIGATOR (C)          ║\n");
+    printf("╠══════════════════════════════════════════╣\n");
+    printf("║  📁 Current: %-28s║\n", current_path);
+    printf("╠══════════════════════════════════════════╣\n");
+    printf("║  1. List Directory Contents              ║\n");
+    printf("║  2. Change Directory                     ║\n");
+    printf("║  3. View File Properties                 ║\n");
+    printf("║  4. Search File                          ║\n");
+    printf("║  5. Copy File                            ║\n");
+    printf("║  6. Delete File                          ║\n");
+    printf("║  7. Rename File                          ║\n");
+    printf("║  8. Exit                                 ║\n");
+    printf("╚══════════════════════════════════════════╝\n");
+    printf("  Enter choice: ");
+}
+
+int main() {
+    char current_path[1024];
+
+    /* Get current working directory as starting point */
+    if (getcwd(current_path, sizeof(current_path)) == NULL) {
+        perror("getcwd failed");
+        return 1;
+    }
+
+    int choice;
+
+    while (1) {
+        print_menu(current_path);
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                list_directory(current_path);
+                break;
+            case 2:
+                change_directory(current_path);
+                break;
+            case 3:
+                view_file_properties(current_path);
+                break;
+            case 4:
+                search_file(current_path);
+                break;
+            case 5:
+                copy_file(current_path);
+                break;
+            case 6:
+                delete_file(current_path);
+                break;
+            case 7:
+                rename_file(current_path);
+                break;
+            case 8:
+                printf("\n[✓] Exiting File Navigator. Goodbye!\n\n");
+                exit(0);
+            default:
+                printf("[!] Invalid choice. Please enter 1-8.\n");
+        }
+    }
+
+    return 0;
+}

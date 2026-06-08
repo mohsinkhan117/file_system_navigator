@@ -1,0 +1,9 @@
+#ifndef NAVIGATOR_H
+#define NAVIGATOR_H
+
+void list_directory(const char *path);
+void change_directory(char *current_path);
+void view_file_properties(const char *current_path);
+void print_permissions(mode_t mode);
+
+#endif
